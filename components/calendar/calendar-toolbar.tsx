@@ -57,7 +57,7 @@ export function CalendarToolbar({
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-xl font-semibold">{dateRangeText || format(currentDate, "MMMM yyyy")}</h2>
+        <h2 className="text-xl font-semibold min-w-[200px]">{dateRangeText || format(currentDate, "MMMM yyyy")}</h2>
       </div>
 
       <div className="flex items-center space-x-2">
