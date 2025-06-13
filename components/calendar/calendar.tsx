@@ -4,8 +4,6 @@ import * as React from "react"
 import { MoreHorizontal } from "lucide-react"
 import {
   format,
-  addMonths,
-  subMonths,
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
@@ -20,27 +18,41 @@ import { Button } from "@/components/ui/button"
 import type { EventType } from "@/types/calendar"
 import { CalendarEvent } from "./calendar-event"
 import { CalendarHeader } from "./calendar-header"
-import { CalendarToolbar } from "./calendar-toolbar"
 
 interface CalendarProps {
   events?: EventType[]
+  currentDate: Date // Add this line
   onEventClick?: (event: EventType) => void
   onDateClick?: (date: Date) => void
   onAddEvent?: (date: Date) => void
   className?: string
 }
 
-export function EventCalendar({ events = [], onEventClick, onDateClick, onAddEvent, className }: CalendarProps) {
-  const [currentDate, setCurrentDate] = React.useState(new Date())
+export function EventCalendar({
+  events = [],
+  currentDate,
+  onEventClick,
+  onDateClick,
+  onAddEvent,
+  className,
+}: CalendarProps) {
+  // Remove the internal state for currentDate and view
+  // Replace:
+  // const [currentDate, setCurrentDate] = React.useState(new Date())
+  // const [view, setView] = React.useState<"month" | "week" | "day">("month")
+
+  // With:
+  // No internal state needed as we'll use props
   const [view, setView] = React.useState<"month" | "week" | "day">("month")
 
   const startDate = startOfMonth(currentDate)
   const endDate = endOfMonth(currentDate)
   const days = eachDayOfInterval({ start: startDate, end: endDate })
 
-  const goToToday = () => setCurrentDate(new Date())
-  const goToNextMonth = () => setCurrentDate(addMonths(currentDate, 1))
-  const goToPreviousMonth = () => setCurrentDate(subMonths(currentDate, 1))
+  // Remove these internal navigation methods:
+  // const goToToday = () => setCurrentDate(new Date())
+  // const goToNextMonth = () => setCurrentDate(addMonths(currentDate, 1))
+  // const goToPreviousMonth = () => setCurrentDate(subMonths(currentDate, 1))
 
   const handleDateClick = (date: Date) => {
     if (onDateClick) {
@@ -63,7 +75,6 @@ export function EventCalendar({ events = [], onEventClick, onDateClick, onAddEve
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
-
       <div className="flex-1 overflow-auto">
         {view === "month" && (
           <div className="grid grid-cols-7 h-full border-t border-l">

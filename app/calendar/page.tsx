@@ -279,6 +279,7 @@ export default function CalendarPage() {
         {view === "month" && (
           <EventCalendar
             events={events}
+            currentDate={currentDate}
             onEventClick={handleEventClick}
             onDateClick={handleDateClick}
             className="h-full"
