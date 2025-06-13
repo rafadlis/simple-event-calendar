@@ -11,6 +11,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
@@ -126,45 +133,36 @@ export function EventForm({
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Event Title */}
-        <div className="space-y-2">
-          <Label htmlFor="title" className="text-sm font-medium">
+        <div className="space-y-2 md:grid md:grid-cols-4 md:items-center md:gap-4 md:space-y-0">
+          <Label htmlFor="title" className="text-sm font-medium md:text-right">
             Event Title
           </Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter event title"
-            required
-            className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-          />
+          <div className="md:col-span-3">
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter event title"
+              required
+              className="transition-all duration-200 focus:ring-2 focus:ring-primary/20 w-full"
+            />
+          </div>
         </div>
 
         {/* Date and Time Section */}
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Date & Time</Label>
-            <div className="flex items-center gap-2">
-              <Switch
-                id="all-day"
-                checked={allDay}
-                onCheckedChange={setAllDay}
-              />
-              <Label htmlFor="all-day" className="text-sm">
-                All day
-              </Label>
-            </div>
-          </div>
-
-          {/* Enhanced Date Selection */}
-          <div>
-            <div className="flex items-center space-x-2">
+        <div className="space-y-2 md:grid md:grid-cols-4 md:items-start md:gap-4 md:space-y-0">
+          <Label className="text-sm font-medium md:text-right md:mt-2">
+            Date & Time
+          </Label>
+          <div className="flex flex-col gap-3 md:col-span-3">
+            <div className="flex flex-col md:flex-row md:items-center md:gap-4">
+              {/* Enhanced Date Selection */}
               <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "flex-1 justify-start text-left font-normal transition-all duration-200 hover:bg-accent/50",
+                      "w-full md:flex-1 justify-start text-left font-normal transition-all duration-200 hover:bg-accent/50",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -217,66 +215,82 @@ export function EventForm({
                   </div>
                 </PopoverContent>
               </Popover>
-            </div>
-          </div>
 
-          {/* Time Selection */}
-          {!allDay && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  Start Time
+              <div className="flex items-center gap-2 mt-2 md:mt-0 shrink-0">
+                <Switch
+                  id="all-day"
+                  checked={allDay}
+                  onCheckedChange={setAllDay}
+                />
+                <Label htmlFor="all-day" className="text-sm">
+                  All day
                 </Label>
-                <TimePicker value={startTime} onChange={setStartTime} />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  End Time
-                </Label>
-                <TimePicker value={endTime} onChange={setEndTime} />
               </div>
             </div>
-          )}
+
+            {/* Time Selection */}
+            {!allDay && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">
+                  Start - End time
+                </Label>
+                <div className="flex items-center gap-2">
+                  <TimePicker value={startTime} onChange={setStartTime} />
+                  <span className="text-sm text-muted-foreground">-</span>
+                  <TimePicker value={endTime} onChange={setEndTime} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Color Selection */}
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Event Color</Label>
-          <div className="grid grid-cols-4 gap-2">
-            {colorOptions.map((colorOption) => (
-              <button
-                key={colorOption.value}
-                type="button"
-                onClick={() => setColor(colorOption.value)}
-                className={cn(
-                  "flex items-center space-x-2 p-2 rounded-md border transition-all duration-200 hover:scale-105",
-                  color === colorOption.value
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-muted hover:border-muted-foreground/30"
-                )}
-              >
-                <div
-                  className={cn("w-3 h-3 rounded-full", colorOption.class)}
-                />
-                <span className="text-xs font-medium">{colorOption.label}</span>
-              </button>
-            ))}
+        <div className="space-y-3 md:grid md:grid-cols-4 md:items-center md:gap-4 md:space-y-0">
+          <Label className="text-sm font-medium md:text-right">
+            Event Color
+          </Label>
+          <div className="md:col-span-3">
+            <Select value={color} onValueChange={setColor}>
+              <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20 w-full">
+                <SelectValue placeholder="Select a color" />
+              </SelectTrigger>
+              <SelectContent>
+                {colorOptions.map((colorOption) => (
+                  <SelectItem key={colorOption.value} value={colorOption.value}>
+                    <div className="flex items-center space-x-2">
+                      <div
+                        className={cn(
+                          "w-3 h-3 rounded-full",
+                          colorOption.class
+                        )}
+                      />
+                      <span>{colorOption.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm font-medium">
+        <div className="space-y-2 md:grid md:grid-cols-4 md:items-start md:gap-4 md:space-y-0">
+          <Label
+            htmlFor="description"
+            className="text-sm font-medium md:text-right md:mt-2"
+          >
             Description
           </Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add event description (optional)"
-            rows={3}
-            className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-          />
+          <div className="md:col-span-3">
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add event description (optional)"
+              rows={3}
+              className="transition-all duration-200 focus:ring-2 focus:ring-primary/20 w-full"
+            />
+          </div>
         </div>
       </form>
 
