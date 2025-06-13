@@ -2,7 +2,15 @@
 
 import * as React from "react"
 import { MoreHorizontal } from "lucide-react"
-import { startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO, isSameDay } from "date-fns"
+import {
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isToday,
+  parseISO,
+  isSameDay,
+} from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -70,17 +78,19 @@ export function EventCalendar({
                   key={day.toString()}
                   className={cn(
                     "min-h-[120px] p-1 border-b border-r relative cursor-pointer transition-colors duration-200 hover:bg-accent/50 group",
-                    !isCurrentMonth && "bg-muted/30 text-muted-foreground hover:bg-muted/50",
-                    isCurrentDay && "bg-blue-50 hover:bg-blue-100",
+                    !isCurrentMonth &&
+                      "bg-muted/30 text-muted-foreground hover:bg-muted/50",
+                    isCurrentDay && "bg-blue-50 hover:bg-blue-100"
                   )}
                   onClick={() => handleDateClick(day)}
                 >
                   <div className="flex justify-between">
                     <span
                       className={cn(
-                        "inline-flex items-center justify-center w-6 h-6 text-sm transition-all duration-200 hover:scale-110",
-                        isCurrentDay && "bg-primary text-primary-foreground rounded-full",
-                        !isCurrentDay && "hover:bg-primary/10 hover:rounded-full",
+                        "inline-flex items-center justify-center px-1.5 py-1 text-sm transition-all duration-200 hover:scale-110",
+                        isCurrentDay &&
+                          "bg-primary text-primary-foreground rounded-md",
+                        !isCurrentDay && "hover:bg-primary/10 hover:rounded-md"
                       )}
                     >
                       {formatWithLocale(day, "d")}
@@ -102,7 +112,11 @@ export function EventCalendar({
 
                   <div className="mt-1 space-y-1 max-h-[80%] overflow-hidden">
                     {dayEvents.map((event) => (
-                      <CalendarEvent key={event.id} event={event} onClick={() => onEventClick && onEventClick(event)} />
+                      <CalendarEvent
+                        key={event.id}
+                        event={event}
+                        onClick={() => onEventClick && onEventClick(event)}
+                      />
                     ))}
                   </div>
                 </div>
