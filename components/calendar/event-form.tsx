@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -15,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import type { EventType } from "@/types/calendar"
 import { TimePicker } from "./time-picker"
+import { formatWithLocale } from "@/lib/date-fns"
 
 interface EventFormProps {
   event?: EventType
@@ -27,8 +27,10 @@ export function EventForm({ event, selectedDate = new Date(), onSubmit, onCancel
   const [title, setTitle] = React.useState(event?.title || "")
   const [description, setDescription] = React.useState(event?.description || "")
   const [date, setDate] = React.useState<Date | undefined>(event?.start ? new Date(event.start) : selectedDate)
-  const [startTime, setStartTime] = React.useState(event?.start ? format(new Date(event.start), "HH:mm") : "09:00")
-  const [endTime, setEndTime] = React.useState(event?.end ? format(new Date(event.end), "HH:mm") : "10:00")
+  const [startTime, setStartTime] = React.useState(
+    event?.start ? formatWithLocale(new Date(event.start), "HH:mm") : "09:00",
+  )
+  const [endTime, setEndTime] = React.useState(event?.end ? formatWithLocale(new Date(event.end), "HH:mm") : "10:00")
   const [color, setColor] = React.useState(event?.color || "green")
   const [allDay, setAllDay] = React.useState(event?.allDay || false)
 
@@ -84,7 +86,7 @@ export function EventForm({ event, selectedDate = new Date(), onSubmit, onCancel
                 className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                {date ? formatWithLocale(date, "PPP") : <span>Pick a date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">

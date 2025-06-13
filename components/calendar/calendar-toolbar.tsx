@@ -2,12 +2,13 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight, Search, Settings, CalendarIcon, CheckSquare } from "lucide-react"
-import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { LocaleSelector } from "@/components/locale-selector"
+import { formatWithLocale } from "@/lib/date-fns"
 
 export type CalendarViewType = "month" | "week" | "day" | "schedule"
 
@@ -57,7 +58,9 @@ export function CalendarToolbar({
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-xl font-semibold min-w-[200px]">{dateRangeText || format(currentDate, "MMMM yyyy")}</h2>
+        <h2 className="text-xl font-semibold min-w-[200px]">
+          {dateRangeText || formatWithLocale(currentDate, "MMMM yyyy")}
+        </h2>
       </div>
 
       <div className="flex items-center space-x-2">
@@ -73,6 +76,8 @@ export function CalendarToolbar({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
+        <LocaleSelector />
 
         <TooltipProvider>
           <Tooltip>

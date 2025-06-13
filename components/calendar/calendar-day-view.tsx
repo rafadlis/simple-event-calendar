@@ -1,9 +1,10 @@
 "use client"
-import { format, parseISO, isSameDay } from "date-fns"
+import { parseISO, isSameDay } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import type { EventType } from "@/types/calendar"
 import { positionEvents } from "@/lib/calendar-utils"
+import { formatWithLocale } from "@/lib/date-fns"
 
 interface DayViewProps {
   currentDate: Date
@@ -51,8 +52,8 @@ export function CalendarDayView({ currentDate, events, onEventClick, onCellClick
       <div className="grid grid-cols-2 border-b">
         <div className="w-16 border-r" />
         <div className="py-2 text-center border-r">
-          <div className="text-sm font-medium">{format(currentDate, "EEEE")}</div>
-          <div className="text-xl">{format(currentDate, "d MMMM yyyy")}</div>
+          <div className="text-sm font-medium">{formatWithLocale(currentDate, "EEEE")}</div>
+          <div className="text-xl">{formatWithLocale(currentDate, "d MMMM yyyy")}</div>
         </div>
       </div>
 
@@ -97,7 +98,8 @@ export function CalendarDayView({ currentDate, events, onEventClick, onCellClick
               >
                 <div className="font-medium truncate">{event.title}</div>
                 <div className="text-xs opacity-90 truncate">
-                  {format(parseISO(event.start), "h:mm a")} - {format(parseISO(event.end), "h:mm a")}
+                  {formatWithLocale(parseISO(event.start), "h:mm a")} -{" "}
+                  {formatWithLocale(parseISO(event.end), "h:mm a")}
                 </div>
                 {event.description && (
                   <div className="text-xs mt-1 opacity-90 line-clamp-2 overflow-hidden">{event.description}</div>

@@ -2,26 +2,18 @@
 
 import * as React from "react"
 import { MoreHorizontal } from "lucide-react"
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameMonth,
-  isToday,
-  parseISO,
-  isSameDay,
-} from "date-fns"
+import { startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, parseISO, isSameDay } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { EventType } from "@/types/calendar"
 import { CalendarEvent } from "./calendar-event"
 import { CalendarHeader } from "./calendar-header"
+import { formatWithLocale } from "@/lib/date-fns"
 
 interface CalendarProps {
   events?: EventType[]
-  currentDate: Date // Add this line
+  currentDate: Date
   onEventClick?: (event: EventType) => void
   onDateClick?: (date: Date) => void
   onAddEvent?: (date: Date) => void
@@ -36,23 +28,11 @@ export function EventCalendar({
   onAddEvent,
   className,
 }: CalendarProps) {
-  // Remove the internal state for currentDate and view
-  // Replace:
-  // const [currentDate, setCurrentDate] = React.useState(new Date())
-  // const [view, setView] = React.useState<"month" | "week" | "day">("month")
-
-  // With:
-  // No internal state needed as we'll use props
   const [view, setView] = React.useState<"month" | "week" | "day">("month")
 
   const startDate = startOfMonth(currentDate)
   const endDate = endOfMonth(currentDate)
   const days = eachDayOfInterval({ start: startDate, end: endDate })
-
-  // Remove these internal navigation methods:
-  // const goToToday = () => setCurrentDate(new Date())
-  // const goToNextMonth = () => setCurrentDate(addMonths(currentDate, 1))
-  // const goToPreviousMonth = () => setCurrentDate(subMonths(currentDate, 1))
 
   const handleDateClick = (date: Date) => {
     if (onDateClick) {
@@ -102,7 +82,7 @@ export function EventCalendar({
                         isCurrentDay && "bg-primary text-primary-foreground rounded-full",
                       )}
                     >
-                      {format(day, "d")}
+                      {formatWithLocale(day, "d")}
                     </span>
                     {dayEvents.length > 0 && (
                       <Button

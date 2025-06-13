@@ -1,9 +1,10 @@
 "use client"
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO } from "date-fns"
+import { startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import type { EventType } from "@/types/calendar"
 import { positionEvents } from "@/lib/calendar-utils"
+import { formatWithLocale } from "@/lib/date-fns"
 
 interface WeekViewProps {
   currentDate: Date
@@ -52,8 +53,8 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
         <div className="w-16 border-r" />
         {days.map((day, i) => (
           <div key={i} className="py-2 text-center border-r">
-            <div className="text-sm font-medium">{format(day, "EEE")}</div>
-            <div className="text-xl">{format(day, "d")}</div>
+            <div className="text-sm font-medium">{formatWithLocale(day, "EEE")}</div>
+            <div className="text-xl">{formatWithLocale(day, "d")}</div>
           </div>
         ))}
       </div>
@@ -105,7 +106,9 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
                       onClick={() => onEventClick && onEventClick(event)}
                     >
                       <div className="font-medium truncate">{event.title}</div>
-                      <div className="text-xs opacity-90 truncate">{format(parseISO(event.start), "h:mm a")}</div>
+                      <div className="text-xs opacity-90 truncate">
+                        {formatWithLocale(parseISO(event.start), "h:mm a")}
+                      </div>
                     </div>
                   )
                 })}

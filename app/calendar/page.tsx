@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { v4 as uuidv4 } from "uuid"
-import { format, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, isSameMonth } from "date-fns"
+import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, isSameMonth } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -14,6 +14,7 @@ import { EventForm } from "@/components/calendar/event-form"
 import { CalendarToolbar, type CalendarViewType } from "@/components/calendar/calendar-toolbar"
 import type { EventType } from "@/types/calendar"
 import { Plus } from "lucide-react"
+import { formatWithLocale } from "@/lib/date-fns"
 
 // Sample events data
 const sampleEvents: EventType[] = [
@@ -182,8 +183,8 @@ const sampleEvents: EventType[] = [
 export default function CalendarPage() {
   const [events, setEvents] = React.useState<EventType[]>(sampleEvents)
   const [view, setView] = React.useState<CalendarViewType>("month")
-  const [currentDate, setCurrentDate] = React.useState<Date>(new Date(2025, 4, 1)) // May 1, 2025
-  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date(2025, 4, 1))
+  const [currentDate, setCurrentDate] = React.useState<Date>(new Date()) // Use today's date
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date())
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedEvent, setSelectedEvent] = React.useState<EventType | undefined>()
   const [isCreating, setIsCreating] = React.useState(false)
@@ -273,17 +274,17 @@ export default function CalendarPage() {
   const getDateRangeText = () => {
     if (view === "schedule") {
       const endDate = addMonths(currentDate, 12)
-      return `${format(currentDate, "MMM yyyy")} – ${format(endDate, "MMM yyyy")}`
+      return `${formatWithLocale(currentDate, "MMM yyyy")} – ${formatWithLocale(endDate, "MMM yyyy")}`
     } else if (view === "week") {
       const endDate = addDays(currentDate, 6)
       if (isSameMonth(currentDate, endDate)) {
-        return `${format(currentDate, "MMMM yyyy")}`
+        return `${formatWithLocale(currentDate, "MMMM yyyy")}`
       }
-      return `${format(currentDate, "MMM")} – ${format(endDate, "MMM yyyy")}`
+      return `${formatWithLocale(currentDate, "MMM")} – ${formatWithLocale(endDate, "MMM yyyy")}`
     } else if (view === "day") {
-      return format(currentDate, "MMMM d, yyyy")
+      return formatWithLocale(currentDate, "MMMM d, yyyy")
     }
-    return format(currentDate, "MMMM yyyy")
+    return formatWithLocale(currentDate, "MMMM yyyy")
   }
 
   return (

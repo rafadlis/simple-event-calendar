@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { format, parseISO, isSameDay, addMonths, isAfter, isBefore } from "date-fns"
+import { parseISO, isSameDay, addMonths, isAfter, isBefore } from "date-fns"
 import { Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { EventType } from "@/types/calendar"
+import { formatWithLocale } from "@/lib/date-fns"
 
 interface ScheduleViewProps {
   currentDate: Date
@@ -39,7 +40,7 @@ export function CalendarScheduleView({ currentDate, events, onEventClick, rangeI
 
     sortedEvents.forEach((event) => {
       const eventDate = parseISO(event.start)
-      const dateKey = format(eventDate, "yyyy-MM-dd")
+      const dateKey = formatWithLocale(eventDate, "yyyy-MM-dd")
 
       if (!grouped[dateKey]) {
         grouped[dateKey] = []
@@ -71,8 +72,8 @@ export function CalendarScheduleView({ currentDate, events, onEventClick, rangeI
         return (
           <div key={dateKey} className="py-4">
             <div className="flex items-baseline mb-2">
-              <h3 className="text-2xl font-bold mr-2">{format(date, "d")}</h3>
-              <div className="text-sm text-muted-foreground uppercase">{format(date, "MMM, EEE")}</div>
+              <h3 className="text-2xl font-bold mr-2">{formatWithLocale(date, "d")}</h3>
+              <div className="text-sm text-muted-foreground uppercase">{formatWithLocale(date, "MMM, EEE")}</div>
             </div>
 
             <div className="space-y-2 pl-2">
@@ -91,7 +92,7 @@ export function CalendarScheduleView({ currentDate, events, onEventClick, rangeI
                     <div className="text-sm text-muted-foreground">
                       {event.allDay
                         ? "All day"
-                        : `${format(parseISO(event.start), "h:mm a")} - ${format(parseISO(event.end), "h:mm a")}`}
+                        : `${formatWithLocale(parseISO(event.start), "h:mm a")} - ${formatWithLocale(parseISO(event.end), "h:mm a")}`}
                     </div>
                     <div className="font-medium">{event.title}</div>
                     {event.description && <div className="text-sm text-muted-foreground mt-1">{event.description}</div>}
