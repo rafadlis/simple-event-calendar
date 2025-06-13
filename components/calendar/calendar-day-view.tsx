@@ -3,6 +3,7 @@ import { format, parseISO, isSameDay } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import type { EventType } from "@/types/calendar"
+import { positionEvents } from "@/lib/calendar-utils"
 
 interface DayViewProps {
   currentDate: Date
@@ -21,7 +22,7 @@ export function CalendarDayView({ currentDate, events, onEventClick, onCellClick
     })
   }
 
-  const getEventPosition = (event: EventType) => {
+  const getEventPosition = (event: EventType, column: number, columnCount: number) => {
     const eventStart = parseISO(event.start)
     const eventEnd = parseISO(event.end)
 
@@ -29,11 +30,21 @@ export function CalendarDayView({ currentDate, events, onEventClick, onCellClick
     const endHour = eventEnd.getHours() + eventEnd.getMinutes() / 60
     const duration = endHour - startHour
 
+    // Calculate width and left position based on column information
+    const width = columnCount > 0 ? `calc(${100 / columnCount}% - 4px)` : "calc(100% - 8px)"
+    const left = columnCount > 0 ? `calc(${(column * 100) / columnCount}% + 4px)` : "4px"
+
     return {
       top: `${startHour * 60}px`,
       height: `${duration * 60}px`,
+      width,
+      left,
     }
   }
+
+  // Get events for the day and position them
+  const eventsForDay = getEventsForDay()
+  const positionedEvents = positionEvents(eventsForDay)
 
   return (
     <div className="flex flex-col h-full">
@@ -71,24 +82,26 @@ export function CalendarDayView({ currentDate, events, onEventClick, onCellClick
             />
           ))}
 
-          {getEventsForDay().map((event, eventIndex) => {
-            const { top, height } = getEventPosition(event)
+          {positionedEvents.map(({ event, column, columnCount }, eventIndex) => {
+            const { top, height, width, left } = getEventPosition(event, column, columnCount)
 
             return (
               <div
                 key={eventIndex}
                 className={cn(
-                  "absolute left-4 right-4 rounded-sm px-3 py-2 text-white overflow-hidden",
+                  "absolute rounded-sm px-2 py-1 text-white overflow-hidden",
                   event.color ? `bg-${event.color}-600` : "bg-green-600",
                 )}
-                style={{ top, height }}
+                style={{ top, height, width, left }}
                 onClick={() => onEventClick && onEventClick(event)}
               >
-                <div className="font-medium">{event.title}</div>
-                <div className="text-xs opacity-90">
+                <div className="font-medium truncate">{event.title}</div>
+                <div className="text-xs opacity-90 truncate">
                   {format(parseISO(event.start), "h:mm a")} - {format(parseISO(event.end), "h:mm a")}
                 </div>
-                {event.description && <div className="text-xs mt-1 opacity-90 line-clamp-2">{event.description}</div>}
+                {event.description && (
+                  <div className="text-xs mt-1 opacity-90 line-clamp-2 overflow-hidden">{event.description}</div>
+                )}
               </div>
             )
           })}

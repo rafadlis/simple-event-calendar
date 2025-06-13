@@ -153,6 +153,30 @@ const sampleEvents: EventType[] = [
     end: new Date(2025, 5, 13, 15, 30).toISOString(),
     color: "purple",
   },
+  {
+    id: "18",
+    title: "Design Review",
+    description: "Review new UI designs",
+    start: new Date(2025, 5, 13, 10, 30).toISOString(),
+    end: new Date(2025, 5, 13, 11, 30).toISOString(),
+    color: "red",
+  },
+  {
+    id: "19",
+    title: "Client Call",
+    description: "Discuss project timeline",
+    start: new Date(2025, 5, 13, 10, 45).toISOString(),
+    end: new Date(2025, 5, 13, 11, 15).toISOString(),
+    color: "yellow",
+  },
+  {
+    id: "20",
+    title: "Quick Standup",
+    description: "Daily team check-in",
+    start: new Date(2025, 5, 13, 10, 0).toISOString(),
+    end: new Date(2025, 5, 13, 10, 15).toISOString(),
+    color: "purple",
+  },
 ]
 
 export default function CalendarPage() {

@@ -3,6 +3,7 @@ import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO 
 
 import { cn } from "@/lib/utils"
 import type { EventType } from "@/types/calendar"
+import { positionEvents } from "@/lib/calendar-utils"
 
 interface WeekViewProps {
   currentDate: Date
@@ -25,7 +26,7 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
     })
   }
 
-  const getEventPosition = (event: EventType) => {
+  const getEventPosition = (event: EventType, column: number, columnCount: number) => {
     const eventStart = parseISO(event.start)
     const eventEnd = parseISO(event.end)
 
@@ -33,9 +34,15 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
     const endHour = eventEnd.getHours() + eventEnd.getMinutes() / 60
     const duration = endHour - startHour
 
+    // Calculate width and left position based on column information
+    const width = columnCount > 0 ? `calc(${100 / columnCount}% - 4px)` : "calc(100% - 4px)"
+    const left = columnCount > 0 ? `calc(${(column * 100) / columnCount}% + 2px)` : "2px"
+
     return {
       top: `${startHour * 60}px`,
       height: `${duration * 60}px`,
+      width,
+      left,
     }
   }
 
@@ -63,44 +70,48 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
         </div>
 
         <div className="grid grid-cols-7 flex-1">
-          {days.map((day, dayIndex) => (
-            <div key={dayIndex} className="relative">
-              {hours.map((hour) => (
-                <div
-                  key={hour}
-                  className="h-[60px] border-b border-r"
-                  onClick={() => {
-                    if (onCellClick) {
-                      const date = new Date(day)
-                      date.setHours(hour)
-                      onCellClick(date)
-                    }
-                  }}
-                />
-              ))}
+          {days.map((day, dayIndex) => {
+            // Get events for this day and position them
+            const eventsForDay = getEventsForDay(day)
+            const positionedEvents = positionEvents(eventsForDay)
 
-              {getEventsForDay(day).map((event, eventIndex) => {
-                const { top, height } = getEventPosition(event)
-
-                return (
+            return (
+              <div key={dayIndex} className="relative">
+                {hours.map((hour) => (
                   <div
-                    key={eventIndex}
-                    className={cn(
-                      "absolute left-1 right-1 rounded-sm px-2 py-1 text-xs text-white overflow-hidden",
-                      event.color ? `bg-${event.color}-600` : "bg-green-600",
-                    )}
-                    style={{ top, height }}
-                    onClick={() => onEventClick && onEventClick(event)}
-                  >
-                    <div className="font-medium">{event.title}</div>
-                    <div className="text-xs opacity-90">
-                      {format(parseISO(event.start), "h:mm a")} - {format(parseISO(event.end), "h:mm a")}
+                    key={hour}
+                    className="h-[60px] border-b border-r"
+                    onClick={() => {
+                      if (onCellClick) {
+                        const date = new Date(day)
+                        date.setHours(hour)
+                        onCellClick(date)
+                      }
+                    }}
+                  />
+                ))}
+
+                {positionedEvents.map(({ event, column, columnCount }, eventIndex) => {
+                  const { top, height, width, left } = getEventPosition(event, column, columnCount)
+
+                  return (
+                    <div
+                      key={eventIndex}
+                      className={cn(
+                        "absolute rounded-sm px-1 py-1 text-xs text-white overflow-hidden",
+                        event.color ? `bg-${event.color}-600` : "bg-green-600",
+                      )}
+                      style={{ top, height, width, left }}
+                      onClick={() => onEventClick && onEventClick(event)}
+                    >
+                      <div className="font-medium truncate">{event.title}</div>
+                      <div className="text-xs opacity-90 truncate">{format(parseISO(event.start), "h:mm a")}</div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          ))}
+                  )
+                })}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
