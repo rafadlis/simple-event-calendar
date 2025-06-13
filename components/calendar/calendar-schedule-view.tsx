@@ -80,12 +80,15 @@ export function CalendarScheduleView({ currentDate, events, onEventClick, rangeI
               {eventsForDate.map((event) => (
                 <div
                   key={event.id}
-                  className="flex items-start py-2 cursor-pointer hover:bg-muted/50 rounded-md px-2"
+                  className="flex items-start py-2 cursor-pointer hover:bg-muted/50 rounded-md px-2 transition-all duration-200 hover:shadow-sm hover:scale-[1.02]"
                   onClick={() => onEventClick && onEventClick(event)}
                 >
                   <div className="mr-4 pt-1">
                     <Circle
-                      className={cn("h-3 w-3 fill-current", event.color ? `text-${event.color}-600` : "text-green-600")}
+                      className={cn(
+                        "h-3 w-3 fill-current transition-all duration-200 hover:scale-125",
+                        event.color ? `text-${event.color}-600` : "text-green-600",
+                      )}
                     />
                   </div>
                   <div className="flex-1">

@@ -69,17 +69,18 @@ export function EventCalendar({
                 <div
                   key={day.toString()}
                   className={cn(
-                    "min-h-[120px] p-1 border-b border-r relative",
-                    !isCurrentMonth && "bg-muted/30 text-muted-foreground",
-                    isCurrentDay && "bg-blue-50",
+                    "min-h-[120px] p-1 border-b border-r relative cursor-pointer transition-colors duration-200 hover:bg-accent/50 group",
+                    !isCurrentMonth && "bg-muted/30 text-muted-foreground hover:bg-muted/50",
+                    isCurrentDay && "bg-blue-50 hover:bg-blue-100",
                   )}
                   onClick={() => handleDateClick(day)}
                 >
                   <div className="flex justify-between">
                     <span
                       className={cn(
-                        "inline-flex items-center justify-center w-6 h-6 text-sm",
+                        "inline-flex items-center justify-center w-6 h-6 text-sm transition-all duration-200 hover:scale-110",
                         isCurrentDay && "bg-primary text-primary-foreground rounded-full",
+                        !isCurrentDay && "hover:bg-primary/10 hover:rounded-full",
                       )}
                     >
                       {formatWithLocale(day, "d")}
@@ -88,7 +89,7 @@ export function EventCalendar({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 opacity-0 group-hover:opacity-100"
+                        className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleAddEvent(day)

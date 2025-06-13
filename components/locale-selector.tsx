@@ -16,7 +16,7 @@ export function LocaleSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" className="hover:scale-110 transition-transform duration-200">
           <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -25,10 +25,10 @@ export function LocaleSelector() {
           <DropdownMenuItem
             key={key}
             onClick={() => setLocale(key as LocaleKey)}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between hover:bg-accent/80 transition-colors duration-200"
           >
             {name}
-            {currentLocale === key && <Check className="h-4 w-4 ml-2" />}
+            {currentLocale === key && <Check className="h-4 w-4 ml-2 text-primary" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

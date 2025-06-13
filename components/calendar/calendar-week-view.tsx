@@ -81,7 +81,7 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
                 {hours.map((hour) => (
                   <div
                     key={hour}
-                    className="h-[60px] border-b border-r"
+                    className="h-[60px] border-b border-r cursor-pointer hover:bg-accent/30 transition-colors duration-200"
                     onClick={() => {
                       if (onCellClick) {
                         const date = new Date(day)
@@ -99,8 +99,10 @@ export function CalendarWeekView({ currentDate, events, onEventClick, onCellClic
                     <div
                       key={eventIndex}
                       className={cn(
-                        "absolute rounded-sm px-1 py-1 text-xs text-white overflow-hidden",
-                        event.color ? `bg-${event.color}-600` : "bg-green-600",
+                        "absolute rounded-sm px-1 py-1 text-xs text-white overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:z-20",
+                        event.color
+                          ? `bg-${event.color}-600 hover:bg-${event.color}-700`
+                          : "bg-green-600 hover:bg-green-700",
                       )}
                       style={{ top, height, width, left }}
                       onClick={() => onEventClick && onEventClick(event)}

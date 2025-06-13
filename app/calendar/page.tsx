@@ -342,7 +342,7 @@ export default function CalendarPage() {
       </div>
 
       <Button
-        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg"
+        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
         onClick={() => {
           setSelectedEvent(undefined)
           setIsDialogOpen(true)
@@ -362,14 +362,9 @@ export default function CalendarPage() {
             selectedDate={selectedDate}
             onSubmit={handleAddEvent}
             onCancel={() => setIsDialogOpen(false)}
+            onDelete={!isCreating && selectedEvent ? handleDeleteEvent : undefined}
+            isCreating={isCreating}
           />
-          {!isCreating && selectedEvent && (
-            <div className="flex justify-between mt-4 pt-4 border-t">
-              <Button variant="destructive" onClick={handleDeleteEvent}>
-                Delete Event
-              </Button>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </div>

@@ -47,14 +47,24 @@ export function CalendarToolbar({
   return (
     <div className="flex items-center justify-between p-4 border-b">
       <div className="flex items-center space-x-2">
-        <Button variant="outline" onClick={onToday}>
+        <Button variant="outline" onClick={onToday} className="hover:scale-105 transition-transform duration-200">
           Today
         </Button>
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={onPrevious}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onPrevious}
+            className="hover:scale-110 transition-transform duration-200"
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onNext}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onNext}
+            className="hover:scale-110 transition-transform duration-200"
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -67,7 +77,7 @@ export function CalendarToolbar({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="hover:scale-110 transition-transform duration-200">
                 <Search className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
@@ -82,7 +92,7 @@ export function CalendarToolbar({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="hover:scale-110 transition-transform duration-200">
                 <Settings className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
@@ -107,7 +117,7 @@ export function CalendarToolbar({
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="hover:scale-110 transition-transform duration-200">
                 <CalendarIcon className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -116,7 +126,7 @@ export function CalendarToolbar({
             </PopoverContent>
           </Popover>
 
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="hover:scale-110 transition-transform duration-200">
             <CheckSquare className="h-4 w-4" />
           </Button>
         </div>

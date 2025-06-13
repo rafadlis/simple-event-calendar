@@ -11,8 +11,10 @@ export function CalendarEvent({ event, onClick }: CalendarEventProps) {
   return (
     <div
       className={cn(
-        "text-xs px-2 py-1 rounded-md truncate cursor-pointer",
-        event.color ? `bg-${event.color}-600 text-white` : "bg-green-600 text-white",
+        "text-xs px-2 py-1 rounded-md truncate cursor-pointer transition-all duration-200 hover:shadow-md hover:z-10",
+        event.color
+          ? `bg-${event.color}-600 text-white hover:bg-${event.color}-700`
+          : "bg-green-600 text-white hover:bg-green-700",
       )}
       onClick={(e) => {
         e.stopPropagation()

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -10,20 +10,31 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
+import { Separator } from "@/components/ui/separator"
+import { Card, CardContent } from "@/components/ui/card"
 import type { EventType } from "@/types/calendar"
 import { TimePicker } from "./time-picker"
 import { formatWithLocale } from "@/lib/date-fns"
+import { addDays, subDays, isToday, isTomorrow, isYesterday } from "date-fns"
 
 interface EventFormProps {
   event?: EventType
   selectedDate?: Date
   onSubmit: (event: Omit<EventType, "id">) => void
   onCancel: () => void
+  onDelete?: () => void
+  isCreating?: boolean
 }
 
-export function EventForm({ event, selectedDate = new Date(), onSubmit, onCancel }: EventFormProps) {
+export function EventForm({
+  event,
+  selectedDate = new Date(),
+  onSubmit,
+  onCancel,
+  onDelete,
+  isCreating = false,
+}: EventFormProps) {
   const [title, setTitle] = React.useState(event?.title || "")
   const [description, setDescription] = React.useState(event?.description || "")
   const [date, setDate] = React.useState<Date | undefined>(event?.start ? new Date(event.start) : selectedDate)
@@ -33,6 +44,7 @@ export function EventForm({ event, selectedDate = new Date(), onSubmit, onCancel
   const [endTime, setEndTime] = React.useState(event?.end ? formatWithLocale(new Date(event.end), "HH:mm") : "10:00")
   const [color, setColor] = React.useState(event?.color || "green")
   const [allDay, setAllDay] = React.useState(event?.allDay || false)
+  const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,85 +81,241 @@ export function EventForm({ event, selectedDate = new Date(), onSubmit, onCancel
     })
   }
 
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDate(newDate)
+      setIsCalendarOpen(false)
+    }
+  }
+
+  const getDateDisplayText = () => {
+    if (!date) return "Pick a date"
+
+    if (isToday(date)) return "Today"
+    if (isTomorrow(date)) return "Tomorrow"
+    if (isYesterday(date)) return "Yesterday"
+
+    return formatWithLocale(date, "PPP")
+  }
+
+  const handleQuickDateSelect = (days: number) => {
+    const newDate = addDays(new Date(), days)
+    setDate(newDate)
+  }
+
+  const colorOptions = [
+    { value: "green", label: "Green", class: "bg-green-500" },
+    { value: "blue", label: "Blue", class: "bg-blue-500" },
+    { value: "red", label: "Red", class: "bg-red-500" },
+    { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
+    { value: "purple", label: "Purple", class: "bg-purple-500" },
+    { value: "orange", label: "Orange", class: "bg-orange-500" },
+    { value: "pink", label: "Pink", class: "bg-pink-500" },
+    { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
+  ]
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
-        <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Add title" required />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Event Title */}
         <div className="space-y-2">
-          <Label>Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+          <Label htmlFor="title" className="text-sm font-medium">
+            Event Title
+          </Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter event title"
+            required
+            className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+
+        {/* Date and Time Section */}
+        <Card className="border-muted/40">
+          <CardContent className="p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Date & Time</Label>
+              <div className="flex items-center space-x-2">
+                <Switch id="all-day" checked={allDay} onCheckedChange={setAllDay} />
+                <Label htmlFor="all-day" className="text-sm">
+                  All day
+                </Label>
+              </div>
+            </div>
+
+            {/* Enhanced Date Selection */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "flex-1 justify-start text-left font-normal transition-all duration-200 hover:bg-accent/50",
+                        !date && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {getDateDisplayText()}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-3 border-b">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-sm">Select Date</h4>
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => date && setDate(subDays(date, 1))}
+                          >
+                            <ChevronLeft className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => date && setDate(addDays(date, 1))}
+                          >
+                            <ChevronRight className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Quick Date Selection */}
+                      <div className="grid grid-cols-3 gap-1 mb-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => handleQuickDateSelect(-1)}
+                        >
+                          Yesterday
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => handleQuickDateSelect(0)}
+                        >
+                          Today
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => handleQuickDateSelect(1)}
+                        >
+                          Tomorrow
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={handleDateSelect}
+                      initialFocus
+                      className="rounded-md"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Time Selection */}
+              {!allDay && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Start Time</Label>
+                    <TimePicker value={startTime} onChange={setStartTime} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">End Time</Label>
+                    <TimePicker value={endTime} onChange={setEndTime} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Color Selection */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Event Color</Label>
+          <div className="grid grid-cols-4 gap-2">
+            {colorOptions.map((colorOption) => (
+              <button
+                key={colorOption.value}
+                type="button"
+                onClick={() => setColor(colorOption.value)}
+                className={cn(
+                  "flex items-center space-x-2 p-2 rounded-md border transition-all duration-200 hover:scale-105",
+                  color === colorOption.value
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-muted hover:border-muted-foreground/30",
+                )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? formatWithLocale(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-            </PopoverContent>
-          </Popover>
+                <div className={cn("w-3 h-3 rounded-full", colorOption.class)} />
+                <span className="text-xs font-medium">{colorOption.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Description */}
         <div className="space-y-2">
-          <Label>Color</Label>
-          <Select value={color} onValueChange={setColor}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="green">Green</SelectItem>
-              <SelectItem value="blue">Blue</SelectItem>
-              <SelectItem value="red">Red</SelectItem>
-              <SelectItem value="yellow">Yellow</SelectItem>
-              <SelectItem value="purple">Purple</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="description" className="text-sm font-medium">
+            Description
+          </Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add event description (optional)"
+            rows={3}
+            className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      </form>
+
+      <Separator />
+
+      {/* Action Button Group */}
+      <div className="flex items-center justify-between">
+        {/* Secondary Actions */}
+        <div className="flex items-center space-x-2">
+          {onDelete && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onDelete}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20 transition-all duration-200"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          )}
+        </div>
+
+        {/* Primary Actions */}
+        <div className="flex items-center space-x-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="hover:bg-muted/80 transition-colors duration-200"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleSubmit} className="hover:scale-105 transition-transform duration-200">
+            {isCreating ? "Create Event" : "Save Changes"}
+          </Button>
         </div>
       </div>
-
-      <div className="flex items-center space-x-2">
-        <Switch id="all-day" checked={allDay} onCheckedChange={setAllDay} />
-        <Label htmlFor="all-day">All day</Label>
-      </div>
-
-      {!allDay && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Start Time</Label>
-            <TimePicker value={startTime} onChange={setStartTime} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>End Time</Label>
-            <TimePicker value={endTime} onChange={setEndTime} />
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Add description"
-          rows={3}
-        />
-      </div>
-
-      <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">Save</Button>
-      </div>
-    </form>
+    </div>
   )
 }
