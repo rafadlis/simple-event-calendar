@@ -1,0 +1,108 @@
+"use client"
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO } from "date-fns"
+
+import { cn } from "@/lib/utils"
+import type { EventType } from "@/types/calendar"
+
+interface WeekViewProps {
+  currentDate: Date
+  events: EventType[]
+  onEventClick?: (event: EventType) => void
+  onCellClick?: (date: Date) => void
+}
+
+export function CalendarWeekView({ currentDate, events, onEventClick, onCellClick }: WeekViewProps) {
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }) // Start on Monday
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 })
+  const days = eachDayOfInterval({ start: weekStart, end: weekEnd })
+
+  const hours = Array.from({ length: 24 }, (_, i) => i)
+
+  const getEventsForDay = (day: Date) => {
+    return events.filter((event) => {
+      const eventStart = parseISO(event.start)
+      return isSameDay(eventStart, day)
+    })
+  }
+
+  const getEventPosition = (event: EventType) => {
+    const eventStart = parseISO(event.start)
+    const eventEnd = parseISO(event.end)
+
+    const startHour = eventStart.getHours() + eventStart.getMinutes() / 60
+    const endHour = eventEnd.getHours() + eventEnd.getMinutes() / 60
+    const duration = endHour - startHour
+
+    return {
+      top: `${startHour * 60}px`,
+      height: `${duration * 60}px`,
+    }
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="grid grid-cols-8 border-b">
+        <div className="w-16 border-r" />
+        {days.map((day, i) => (
+          <div key={i} className="py-2 text-center border-r">
+            <div className="text-sm font-medium">{format(day, "EEE")}</div>
+            <div className="text-xl">{format(day, "d")}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-1 overflow-y-auto">
+        <div className="w-16 flex-shrink-0">
+          {hours.map((hour) => (
+            <div key={hour} className="h-[60px] border-b border-r relative">
+              <span className="absolute -top-3 right-2 text-xs text-muted-foreground">
+                {hour === 0 ? "12 AM" : hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 flex-1">
+          {days.map((day, dayIndex) => (
+            <div key={dayIndex} className="relative">
+              {hours.map((hour) => (
+                <div
+                  key={hour}
+                  className="h-[60px] border-b border-r"
+                  onClick={() => {
+                    if (onCellClick) {
+                      const date = new Date(day)
+                      date.setHours(hour)
+                      onCellClick(date)
+                    }
+                  }}
+                />
+              ))}
+
+              {getEventsForDay(day).map((event, eventIndex) => {
+                const { top, height } = getEventPosition(event)
+
+                return (
+                  <div
+                    key={eventIndex}
+                    className={cn(
+                      "absolute left-1 right-1 rounded-sm px-2 py-1 text-xs text-white overflow-hidden",
+                      event.color ? `bg-${event.color}-600` : "bg-green-600",
+                    )}
+                    style={{ top, height }}
+                    onClick={() => onEventClick && onEventClick(event)}
+                  >
+                    <div className="font-medium">{event.title}</div>
+                    <div className="text-xs opacity-90">
+                      {format(parseISO(event.start), "h:mm a")} - {format(parseISO(event.end), "h:mm a")}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
